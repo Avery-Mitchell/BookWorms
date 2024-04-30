@@ -1,3 +1,13 @@
+/*
+    NAMES:  Lauren Higgins
+            Jerry Li
+            Avery Mitchell
+            Armarion Parnell
+    GROUP: Book Worms
+    ASSIGNMENT: Project Phase III
+
+*/
+
 #include <iostream>
 #include "menu.h"
 
