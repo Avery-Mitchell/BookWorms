@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string.h>
 #include "menu.h"
 using namespace std;
 
@@ -14,15 +15,25 @@ void printLogo()
    
 }
 
-bool login()
+void collectLogin(std::string& username, std::string& password, bool& isAdmin)
 {
-    string username, password;
-    cout << "ENTER USERNAME: ";
-    cin >> username;
-    cout << "ENTER PASSWORD: ";
-    cin >> password;
-
-    return true;
+    std::string tAdmin = "Z";
+    isAdmin = false;
+    std::cout << "ENTER FIRST AND LAST NAME (e.x. John Doe): ";
+    std::getline(std::cin, username);
+    std::cout << "ENTER PASSWORD (case sensitive): ";
+    std::getline(std::cin, password);
+    std::cout << "ARE YOU A LIBRARIAN? [Y/N]: ";
+    std::getline(std::cin, tAdmin);
+    while(tAdmin != "Y" && tAdmin != "N")
+    {
+        std::cout << "ARE YOU A LIBRARIAN? [Y/N]: ";
+        std::cin >> tAdmin;
+    }
+    if(tAdmin == "Y")
+    {
+        isAdmin = true;
+    }
 }
 
 void printMenu(bool isAdmin)
