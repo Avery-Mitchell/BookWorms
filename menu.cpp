@@ -11,7 +11,8 @@ void printLogo()
    cout << "| ___ \\| | | || | | |    \\| |/\\| || | | |    /| |\\/| | `--. \\\n";
    cout << "| |_/ /\\ \\_/ /\\ \\_/ / |\\  \\  /\\  /\\ \\_/ / |\\ \\| |  | |/\\__/ /\n";
    cout << "\\____/  \\___/  \\___/\\_| \\_/\\/  \\/  \\___/\\_| \\_\\_|  |_/\\____/ \n";
-   cout << "LIBRARY DATABASE SOLUTION\n" << endl;
+   cout << "LIBRARY DATABASE SOLUTION\n";
+   cout << "=============================================================\n" << std::endl;
    
 }
 
@@ -39,26 +40,28 @@ void collectLogin(std::string& username, std::string& password, bool& isAdmin)
 void printMenu(bool isAdmin)
 {
     cout << endl;
-    cout << "    __  __________   ____  __\n";
-    cout << "   /  |/  / ____/ | / / / / /\n";
-    cout << "  / /|_/ / __/ /  |/ / / / / \n";
-    cout << " / /  / / /___/ /|  / /_/ /  \n";
-    cout << "/_/  /_/_____/_/ |_/\\____/  \n";
-    cout << "=============================\n\n";
+    cout << "===============================\n";
+    cout << "     __  __________   ____  __\n";
+    cout << "    /  |/  / ____/ | / / / / /\n";
+    cout << "   / /|_/ / __/ /  |/ / / / / \n";
+    cout << "  / /  / / /___/ /|  / /_/ /  \n";
+    cout << " /_/  /_/_____/_/ |_/\\____/  \n";
+    cout << "===============================\n\n";
 
-    cout << "1.  Search Books\n";
-    cout << "2.  Add Review\n";
-    cout << "3.  View Borrow History\n";
-    cout << "4.  Manage Account\n\n";
+    cout << "1.  QUIT\n";
+    cout << "2.  Search Books\n";
+    cout << "3.  Add Review\n";
+    cout << "4.  View Borrow History\n";
+    cout << "5.  Manage Account\n";
 
     if(isAdmin){
         cout << "LIBRARIAN FUNCTIONS:\n";
-        cout << "5.  Check Out Book\n";
-        cout << "6.  Check In Book\n";
-        cout << "7.  Add Book\n";
-        cout << "8.  Edit Book\n";
-        cout << "9.  Remove Book\n";
-        cout << "10. Add New Acount\n";
-        cout << "11. Remove Account\n\n";
+        cout << "6.  Check Out Book\n";
+        cout << "7.  Check In Book\n";
+        cout << "8.  Add Book\n";
+        cout << "9.  Edit Book\n";
+        cout << "10. Remove Book\n";
+        cout << "11. Add New Acount\n";
+        cout << "12. Remove Account\n\n";
     }
 }
