@@ -30,8 +30,9 @@ int main()
     }
 
     //Connects to the database
-    // mysql_real_connect parameters:   mysql object, hostname, user, password, database name, port, unix socket, client flag
-    if(mysql_real_connect(conn, "localhost", "root", "2016VWJetta!", "BOOKWORMS", 0, NULL, 0) == NULL){
+    //mysql_real_connect parameters:   mysql object, hostname, user, password, database name, port, unix socket, client flag
+    //You need to run a local instance of the database, I've been using MySQL Workbench - Avery
+    if(mysql_real_connect(conn, "localhost", "root", "password", "BOOKWORMS", 0, NULL, 0) == NULL){
         std::cout << "ERROR CONNECTING TO DATABASE\n";
         mysql_close(conn);
         exit(1);
@@ -43,7 +44,7 @@ int main()
     std::string username, password;
     collectLogin(username, password, isAdmin);
     while(!login(conn, isAdmin, username, password)){
-        std::cout << "INCORRECT, TRY AGAIN" << std::endl;
+        std::cout << "INCORRECT, TRY AGAIN\n";
         collectLogin(username, password, isAdmin);
         login(conn, isAdmin, username, password);
     }
