@@ -157,3 +157,61 @@ void searchBooks(MYSQL *conn)
         searchISBN(conn, ISBN);
     }
 }
+
+void addReview(MYSQL *conn, std::string ISBN, std::string user_id)
+{
+    // Step 1: Fetch the current rating and number of ratings for the book
+    char query_fetch[1000];
+    sprintf(query_fetch, "SELECT prev_rating, num_ratings FROM BOOK WHERE ISBN='%s'", ISBN.c_str());
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+
+    if(mysql_query(conn, query_fetch)) {
+        std::cout << "Error querying book details.\n";
+        return;
+    }
+
+    res = mysql_store_result(conn);
+    if((row = mysql_fetch_row(res)) == NULL) {
+        std::cout << "Book not found.\n";
+        mysql_free_result(res);
+        return;
+    }
+
+    double prev_rating = atof(row[0]);
+    int num_ratings = atoi(row[1]);
+    mysql_free_result(res);
+
+    // Step 2: Fetch existing rate by this user for the book
+    int rate = 0;
+    char query_user_rate[1000];
+    sprintf(query_user_rate, "SELECT rate FROM CHECK_OUT WHERE check_out_ISBN='%s' AND user_checkout_id='%s'", ISBN.c_str(), user_id.c_str());
+
+    if(mysql_query(conn, query_user_rate)) {
+        std::cout << "Error querying user rate.\n";
+        return;
+    }
+
+    res = mysql_store_result(conn);
+    if((row = mysql_fetch_row(res))) {
+        rate = atoi(row[0]);  // Use existing rate if available
+        mysql_free_result(res);
+    } else {
+        // If no existing rate found, prompt user to enter a new rating
+        mysql_free_result(res);
+        std::cout << "No previous rating found by user. Enter your rating (0-5): ";
+        std::cin >> rate;
+    }
+
+    // Steps 3 & 4: Update the book's rating and number of ratings
+    char query_update[1000];
+    sprintf(query_update, "UPDATE BOOK SET prev_rating = ((prev_rating * num_ratings + %d) / (num_ratings + 1)), num_ratings = num_ratings + 1 WHERE ISBN='%s'", rate, ISBN.c_str());
+
+    if(mysql_query(conn, query_update)) {
+        std::cout << "Error updating book rating.\n";
+    } else {
+        std::cout << "Rating updated successfully!\n";
+    }
+}
+
+

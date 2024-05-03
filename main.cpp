@@ -71,8 +71,13 @@ int main()
             case 2: // Search Books
                 searchBooks(conn);
                 break;
-            case 3: // Add Review
+            case 3: {// Add Review 
+                std::string reviewISBN;
+                std::cout << "Enter ISBN of the book to review: ";
+                std::cin >> reviewISBN;
+                addReview(conn, reviewISBN, username);
                 break;
+            }
             case 4: // View Borrow History
                 break;
             case 5: // Manage Account
