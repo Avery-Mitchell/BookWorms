@@ -55,16 +55,21 @@ int main()
         std::cout << "LOGIN SUCCESSFUL\n";
     }
 
+
+    // TODO: THIS NEEDS TO BE FIXED
     while(true)
     {
         printMenu(isAdmin);
+        std::cout << "Enter Option: ";
         std::cin >> option;
+        std::cin.ignore();
         switch(option){
             case 1: // Quit
                 std::cout << "BYE!";
                 exit(1);
                 break;
             case 2: // Search Books
+                searchBooks(conn);
                 break;
             case 3: // Add Review
                 break;
@@ -86,7 +91,12 @@ int main()
                 break;
             case 12: // Remove Account
                 break;
+            default:
+                std::cout << "Select Valid Option";
+                break;
         }
+        option = 1;
+        std::cin.sync();
     }
     return 0;
 }
