@@ -158,7 +158,7 @@ void searchBooks(MYSQL *conn)
     }
 }
 
-void addReview(MYSQL *conn, std::string ISBN, std::string user_id)
+void addReview(MYSQL *conn, std::string ISBN, std::string username)
 {
     // Step 1: Fetch the current rating and number of ratings for the book
     char query_fetch[1000];
@@ -185,7 +185,7 @@ void addReview(MYSQL *conn, std::string ISBN, std::string user_id)
     // Step 2: Fetch existing rate by this user for the book
     int rate = 0;
     char query_user_rate[1000];
-    sprintf(query_user_rate, "SELECT rate FROM CHECK_OUT WHERE check_out_ISBN='%s' AND user_checkout_id='%s'", ISBN.c_str(), user_id.c_str());
+    sprintf(query_user_rate, "SELECT rate FROM CHECK_OUT WHERE check_out_ISBN='%s' AND user_checkout_id='%s'", ISBN.c_str(), username.c_str());
 
     if(mysql_query(conn, query_user_rate)) {
         std::cout << "Error querying user rate.\n";
