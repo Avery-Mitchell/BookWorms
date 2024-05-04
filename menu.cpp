@@ -16,7 +16,7 @@ void printLogo()
     cout << "\\____/  \\___/  \\___/\\_| \\_/\\/  \\/  \\___/\\_| \\_\\_|  |_/\\____/ \n";
     cout << "LIBRARY DATABASE SOLUTION\n";
     cout << "=============================================================\n" << std::endl;
-   
+
 }
 
 void collectLogin(std::string& username, std::string& password, bool& isAdmin)
@@ -76,16 +76,16 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
     switch(option){
         case 1: // Quit
             {
-            std::cout << "BYE!" << std::endl;
-            exit(1);
-            break;
+                std::cout << "BYE!" << std::endl;
+                exit(1);
+                break;
             }
         case 2: // Search Books
             {
-            searchBooks(conn);
-            break;
+                searchBooks(conn);
+                break;
             }
-        case 3: // Add Review 
+        case 3: // Add Review
             {
                 std::string reviewISBN;
                 std::cout << "Enter ISBN of the book to review: ";
@@ -135,12 +135,12 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
             }
         case 12: // Remove Account
             {
-            break;
+                break;
             }
         default:
             {
-            std::cout << "Select Valid Option";
-            break;
+                std::cout << "Select Valid Option";
+                break;
             }
     }
 }
