@@ -80,6 +80,20 @@ std::string userID(MYSQL *conn, std::string username)
     return userid;
 }
 
+int getMaxID(MYSQL *conn, std::string tableName, std::string idColumnName) {
+    std::string query = "SELECT MAX(" + idColumnName + ") FROM " + tableName;
+    if (mysql_query(conn, query.c_str())) {
+        std::cerr << "Error getting max ID: " << mysql_error(conn) << std::endl;
+        return -1; // Error condition
+    }
+
+    MYSQL_RES *result = mysql_store_result(conn);
+    MYSQL_ROW row = mysql_fetch_row(result);
+    int maxID = (row && row[0]) ? std::stoi(row[0]) : 0;
+    mysql_free_result(result);
+    return maxID;
+}
+
 // SEARCHES FOR A BOOK BY ITS NAME
 bool searchName(MYSQL *conn, std::string title)
 {
@@ -375,4 +389,52 @@ void checkIn(MYSQL *conn)
     mysql_query(conn, updateRating.c_str());
 
     std::cout << "Book has been checked in" << std::endl;
+}
+
+void addNewUser(MYSQL *conn)
+{
+    char type;
+    int newID;
+    std::cout << "Account type (Patron(P)/Librarian(L)): ";
+    std::cin >> type;
+    while(type != 'P' && type != 'L')
+    {
+        std::cout << "Invalid type! Account type (Patron(P)/Librarian(L)) :";
+        std::cin >> type;
+    }
+
+    std::string username, address, birthday, password, query;
+    std::cout << "Enter username (e.x. John Doe): ";
+    std::cin.ignore();
+    std::getline(std::cin, username);
+    std::cout << "Enter address: ";
+    std::cin.ignore();
+    std::getline(std::cin, address);
+    std::cout << "Enter birthday (YYYY-MM-DD): ";
+    std::cin >> birthday;
+    std::cout << "Enter password: ";
+    std::cin >> password;
+
+    if(type == 'P')
+    {
+        newID = getMaxID(conn, "PATRON", "user_id") + 1;
+        query = "INSERT INTO PATRON (user_id, user_name, user_address, user_birthday, user_pass) VALUES (" + std::to_string(newID) + ", '" + username + "', '" + address + "', '" + birthday + "', '" + password + "')";
+    }
+    else
+    {
+        int branchNo;
+        newID = getMaxID(conn, "LIBRARIAN", "e_id") + 1;
+        std::cout << "Enter branch number: ";
+        std::cin >> branchNo;
+        query = "INSERT INTO LIBRARIAN (e_id, e_name, e_branch_no, e_pass) VALUES (" + std::to_string(newID) + ", '" + username + "', " + std::to_string(branchNo) + ", '" + password + "')";
+        std::cout << query;
+    }
+
+    if(mysql_query(conn, query.c_str()))
+    {
+        std::cout << "Error creating new account";
+        return;
+    }
+
+    std::cout << "New account successfully created" << std::endl;
 }

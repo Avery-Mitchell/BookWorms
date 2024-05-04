@@ -55,6 +55,8 @@ int main()
         std::cout << "LOGIN SUCCESSFUL\n";
     }
 
+    addNewUser(conn);
+
     while(true)
     {
         printMenu(conn, username, userid, isAdmin);

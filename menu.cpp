@@ -76,7 +76,7 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
     switch(option){
         case 1: // Quit
             {
-            std::cout << "BYE!";
+            std::cout << "BYE!" << std::endl;
             exit(1);
             break;
             }
@@ -127,7 +127,8 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
             }
         case 11: // Add new Account
             {
-            break;
+                addNewUser(conn);
+                break;
             }
         case 12: // Remove Account
             {
