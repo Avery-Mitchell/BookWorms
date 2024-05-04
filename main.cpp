@@ -78,6 +78,7 @@ int main()
                 break;
             }
             case 4: // View Borrow History
+                viewBorrowHistory(conn, username);
                 break;
             case 5: // Manage Account
                 break;

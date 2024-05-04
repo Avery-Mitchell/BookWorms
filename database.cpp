@@ -160,7 +160,7 @@ void searchBooks(MYSQL *conn)
 
 void addReview(MYSQL *conn, std::string ISBN, std::string username)
 {
-    // Step 1: Fetch the current rating and number of ratings for the book
+    // Fetch the current rating and number of ratings for the book
     char query_fetch[1000];
     sprintf(query_fetch, "SELECT prev_rating, num_ratings FROM BOOK WHERE ISBN='%s'", ISBN.c_str());
     MYSQL_RES *res;
@@ -182,7 +182,7 @@ void addReview(MYSQL *conn, std::string ISBN, std::string username)
     int num_ratings = atoi(row[1]);
     mysql_free_result(res);
 
-    // Step 2: Fetch existing rate by this user for the book
+    // Fetch existing rate by this user for the book
     int rate = 0;
     char query_user_rate[1000];
     sprintf(query_user_rate, "SELECT rate FROM CHECK_OUT WHERE check_out_ISBN='%s' AND check_out_id='%s'", ISBN.c_str(), username.c_str());
@@ -203,7 +203,7 @@ void addReview(MYSQL *conn, std::string ISBN, std::string username)
         std::cin >> rate;
     }
 
-    // Steps 3 & 4: Update the book's rating and number of ratings
+    // Update the book's rating and number of ratings
     char query_update[1000];
     sprintf(query_update, "UPDATE BOOK SET prev_rating = ((prev_rating * num_ratings + %d) / (num_ratings + 1)), num_ratings = num_ratings + 1 WHERE ISBN='%s'", rate, ISBN.c_str());
 
@@ -214,4 +214,45 @@ void addReview(MYSQL *conn, std::string ISBN, std::string username)
     }
 }
 
+void viewBorrowHistory(MYSQL *conn, std::string username)
+{
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    char query[1000];
 
+    // Construct the SQL query to find the previous books borrowed by the user
+    sprintf(query, "SELECT prev_book_ISBN, title FROM USER_PREV_BOOKS JOIN BOOK ON USER_PREV_BOOKS.prev_book_ISBN = BOOK.ISBN WHERE users_id='%s'", username.c_str());
+
+    // Execute the query
+    if(mysql_query(conn, query))
+    {
+        std::cout << "ERROR QUERYING DATABASE\n";
+        return;
+    }
+
+    // Store the result of the query
+    res = mysql_store_result(conn);
+    if(!res)
+    {
+        std::cout << "ERROR RETRIEVING QUERY RESULTS\n";
+        return;
+    }
+
+    // Check if any rows are returned
+    if(mysql_num_rows(res) == 0)
+    {
+        std::cout << "No borrowing history found for user ID: " << username << "\n";
+        mysql_free_result(res);
+        return;
+    }
+
+    // Output the titles and ISBNs of the previously borrowed books
+    std::cout << "Borrowing History for User ID " << username << ":\n";
+    while ((row = mysql_fetch_row(res)) != NULL)
+    {
+        std::cout << "ISBN: " << row[0] << " - Title: " << row[1] << "\n";
+    }
+
+    // Clean up the result set
+    mysql_free_result(res);
+}

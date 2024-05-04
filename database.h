@@ -9,5 +9,7 @@ bool searchName(MYSQL *conn, std::string title);
 bool searchISBN(MYSQL *conn, std::string ISBN);
 void searchBooks(MYSQL *conn);
 void addReview(MYSQL *conn, std::string ISBN, std::string username);
+void viewBorrowHistory(MYSQL *conn, std::string username);
+
 
 #endif
