@@ -87,29 +87,31 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
             }
         case 3: // Add Review 
             {
-            std::string reviewISBN;
-            std::cout << "Enter ISBN of the book to review: ";
-            std::cin >> reviewISBN;
-            addReview(conn, reviewISBN, username);
-            break;
+                std::string reviewISBN;
+                std::cout << "Enter ISBN of the book to review: ";
+                std::cin >> reviewISBN;
+                addReview(conn, reviewISBN, username);
+                break;
             }
         case 4: // View Borrow History
             {
-            viewBorrowHistory(conn, userid);
-            break;
+                viewBorrowHistory(conn, userid);
+                break;
             }
         case 5: // Manage Account
             {
-            manageAccount(conn, isAdmin, userid);
-            break;
+                manageAccount(conn, isAdmin, userid);
+                break;
             }
         case 6: // Check Out Book
             {
-            break;
+
+                break;
             }
         case 7: // Check In Book
             {
-            break;
+                checkIn(conn);
+                break;
             }
         case 8: // Add Book
             {

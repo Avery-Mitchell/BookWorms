@@ -55,8 +55,6 @@ int main()
         std::cout << "LOGIN SUCCESSFUL\n";
     }
 
-    // TODO: THIS NEEDS TO BE FIXED
-    
     while(true)
     {
         printMenu(conn, username, userid, isAdmin);

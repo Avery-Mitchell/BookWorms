@@ -2,6 +2,7 @@
 #include <cstring>
 #include "database.h"
 
+// Login to the database
 bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, std::string password)
 {
     MYSQL_RES *res;
@@ -54,6 +55,32 @@ bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, 
     }
 }
 
+// gets userid from their username
+std::string userID(MYSQL *conn, std::string username)
+{
+    std::string userid, query;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    query = "SELECT user_id FROM PATRON WHERE user_name = '" + username + "'";
+    while(mysql_query(conn, query.c_str()))
+    {
+        std::cout << "No patron with that name";
+        std::cout << "What is the patron's name (e.x. John Doe): ";
+        std::cin >> username;
+        query = "SELECT user_id FROM PATRON WHERE user_name = '" + username + "'";
+    }
+    
+    res = mysql_store_result(conn);
+    if((row = mysql_fetch_row(res)) != NULL)
+        {
+            userid = row[0];
+            mysql_free_result(res);
+        }
+    
+    return userid;
+}
+
+// SEARCHES FOR A BOOK BY ITS NAME
 bool searchName(MYSQL *conn, std::string title)
 {
     MYSQL_RES *res;
@@ -314,4 +341,38 @@ void manageAccount(MYSQL *conn, bool admin, std::string username)
     } else {
         std::cout << "Password updated successfully for " << (role == "Librarian" ? "librarian" : "patron") << " ID " << targetUser << "\n";
     }
+}
+
+void checkout();
+
+void checkIn(MYSQL *conn)
+{
+    std::string username, userid;
+    std::cout << "What is the patron's name (e.x. John Doe): ";
+    std::cin >> username;
+    userid = userID(conn, username);
+
+    std::string ISBN;
+    std::cin.clear();
+    std::cout << "Enter book's ISBN: ";
+    std::cin >> ISBN;
+    std::cin.clear();
+    std::string updateCheckout = "UPDATE CHECK_OUT SET return_date = CURDATE() WHERE check_out_id = '" + userid + "' AND check_out_ISBN = '" + ISBN + "'";
+    mysql_query(conn, updateCheckout.c_str());
+    if(mysql_affected_rows(conn) == 0)
+    {
+        std::cout << "No book matching that ISBN has been found";
+    }
+    std::string updatePrevBooks = "INSERT INTO USER_PREV_BOOKS (user_id, prev_book_ISBN) VALUES ('" + userid + ", '" + ISBN + "')'";
+    std::string updateAvailability = "UPDATE BOOK SET availability = availability + 1 WHERE ISBN = '" + ISBN + "'";
+    mysql_query(conn, updateAvailability.c_str());
+
+    std::string rate;
+    std::cin.clear();
+    std::cout << std::endl << "Enter a rating (1-5): ";
+    std::cin >> rate;
+    std::string updateRating = "UPDATE CHECK_OUT SET rate = " + rate + "WHERE check_out_id = '" + userid + "' AND check_out_ISBN = '" + ISBN + "'";
+    mysql_query(conn, updateRating.c_str());
+
+    std::cout << "Book has been checked in" << std::endl;
 }
