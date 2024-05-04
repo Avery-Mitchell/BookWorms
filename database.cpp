@@ -376,3 +376,66 @@ void checkIn(MYSQL *conn)
 
     std::cout << "Book has been checked in" << std::endl;
 }
+
+void addBooks(MYSQL *conn) {
+    std::string ISBN, title, author, publish_date;
+    int page_count, additional_copies;
+    int prev_rating = 0;  // Assuming new books start with no ratings
+    int num_ratings = 0;  // Initializing num_ratings to 0 for new books
+
+    // Collect book details from user
+    std::cout << "Enter ISBN: ";
+    std::getline(std::cin, ISBN);
+    std::cout << "Enter Title: ";
+    std::getline(std::cin, title);
+    std::cout << "Enter Author: ";
+    std::getline(std::cin, author);
+    std::cout << "Enter Publish Date (YYYY-MM-DD): ";
+    std::getline(std::cin, publish_date);
+    std::cout << "Enter Page Count: ";
+    std::cin >> page_count;
+    std::cin.ignore();
+    std::cout << "Enter number of copies to add: ";
+    std::cin >> additional_copies;
+    std::cin.ignore();
+
+    // Check if the book already exists in the database
+    char check_query[1000];
+    sprintf(check_query, "SELECT availability FROM BOOK WHERE ISBN='%s'", ISBN.c_str());
+    if (mysql_query(conn, check_query)) {
+        std::cout << "ERROR CHECKING BOOK EXISTENCE: " << mysql_error(conn) << "\n";
+        return;
+    }
+
+    MYSQL_RES *res = mysql_store_result(conn);
+    if (mysql_num_rows(res) > 0) {
+        MYSQL_ROW row = mysql_fetch_row(res);
+        int current_availability = atoi(row[0]);
+        mysql_free_result(res);
+
+        // Book exists, update the availability
+        int new_availability = current_availability + additional_copies;
+        char update_query[1000];
+        sprintf(update_query, "UPDATE BOOK SET availability = %d WHERE ISBN='%s'", new_availability, ISBN.c_str());
+        if (mysql_query(conn, update_query)) {
+            std::cout << "ERROR UPDATING BOOK AVAILABILITY: " << mysql_error(conn) << "\n";
+        } else {
+            std::cout << "Book availability updated successfully. Total available now: " << new_availability << "\n";
+        }
+        return;
+    } else {
+        // If the book does not exist, insert the new book into the database
+        char insert_query[1000];
+        sprintf(insert_query, "INSERT INTO BOOK (ISBN, title, author, publish_date, page_count, availability, prev_rating, num_ratings) VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, %d)",
+            ISBN.c_str(), title.c_str(), author.c_str(), publish_date.c_str(), page_count, additional_copies, prev_rating, num_ratings);
+
+        // Execute the query
+        if (mysql_query(conn, insert_query)) {
+            std::cout << "ERROR ADDING BOOK: " << mysql_error(conn) << "\n";
+        } else {
+            std::cout << "New book added successfully with " << additional_copies << " copies available.\n";
+        }
+    }
+    mysql_free_result(res);
+
+}
