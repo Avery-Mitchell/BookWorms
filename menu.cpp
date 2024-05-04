@@ -120,6 +120,7 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
             }
         case 9: // Edit Book
             {
+                editBooks(conn);
             break;
             }
         case 10: // Remove Book
