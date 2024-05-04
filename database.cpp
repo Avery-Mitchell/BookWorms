@@ -539,6 +539,55 @@ void editBooks(MYSQL *conn) {
     }
 }
 
+void removeBooks(MYSQL *conn) {
+    std::string ISBN;
+    int remove_count, current_availability;
+
+    // Ask for ISBN to identify the book to remove copies from
+    std::cout << "Enter ISBN of the book to remove copies from: ";
+    std::getline(std::cin, ISBN);
+
+    // Check current availability
+    char query[1000];
+    sprintf(query, "SELECT availability FROM BOOK WHERE ISBN='%s'", ISBN.c_str());
+    if (mysql_query(conn, query)) {
+        std::cout << "Error checking book availability: " << mysql_error(conn) << "\n";
+        return;
+    }
+
+    MYSQL_RES *res = mysql_store_result(conn);
+    if (!res || mysql_num_rows(res) == 0) {
+        std::cout << "No book found with ISBN " << ISBN << ".\n";
+        if (res) {
+            mysql_free_result(res);
+        }
+        return;
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(res);
+    current_availability = atoi(row[0]);
+    mysql_free_result(res);
+
+    std::cout << "Current availability of the book: " << current_availability << "\n";
+    std::cout << "How many copies would you like to remove? ";
+    std::cin >> remove_count;
+    std::cin.ignore();
+
+    if (remove_count > current_availability) {
+        std::cout << "Cannot remove more copies than are available.\n";
+        return;
+    }
+
+    // Update availability
+    int new_availability = current_availability - remove_count;
+    sprintf(query, "UPDATE BOOK SET availability = %d WHERE ISBN='%s'", new_availability, ISBN.c_str());
+    if (mysql_query(conn, query)) {
+        std::cout << "Error updating book availability: " << mysql_error(conn) << "\n";
+    } else {
+        std::cout << "Updated the book successfully. New availability: " << new_availability << ".\n";
+    }
+}
+
 void addNewUser(MYSQL *conn)
 {
     char type;

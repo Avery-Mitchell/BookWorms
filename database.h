@@ -17,5 +17,6 @@ void checkIn(MYSQL *conn);
 void addNewUser(MYSQL *conn);
 void addBooks(MYSQL *conn);
 void editBooks(MYSQL *conn);
+void removeBooks(MYSQL *conn);
 
 #endif

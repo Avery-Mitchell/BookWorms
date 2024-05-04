@@ -116,16 +116,17 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
         case 8: // Add Book
             {
                 addBooks(conn);
-            break;
+                break;
             }
         case 9: // Edit Book
             {
                 editBooks(conn);
-            break;
+                break;
             }
         case 10: // Remove Book
             {
-            break;
+                removeBooks(conn);
+                break;
             }
         case 11: // Add new Account
             {
