@@ -102,7 +102,7 @@ INSERT INTO PATRON
 	Values (840829, 'Josiah Nicholson', '456 Novel Ave, Rolla, MO', '1999-10-05', 'j0s!ah'), (549275, 'David Blevins', '189 Storybook St, St. James, MO', '2001-07-20', 'blevyreads'), (290378, 'Haroon Trevino', ' 920 Literary Ln, Wildwood, MO', '1983-12-11', 'password123'), (316372, 'Keith Stephenson', '829 Dewey Decimal Dr, Florissant, MO', '2005-03-30', 'K3!thS'),(906849, 'Nora Graves', '918 Bookworm Boulevard, Troy, MO', '1976-07-26', 'gr@vy');
     
 INSERT INTO BOOK
-	Values (9780545010221, 'Harry Potter and the Deathly Hallows', 'J.K. Rowling', '2009-07-31', 607, 0, 4.5, 1254), (9780804189354, 'The Martian', 'Andy Weir', '2011-05-04', 400, 1, 4.3, 567), (9780064400558, 'Charlotte\'s Web', 'E.B. White', '1952-10-15', 184, 0, 3.7, 459), (9780486828060, 'Little Women', 'Louisa May Alcott', '1868-9-30', 480, 1, 3.2, 692), (9780060598242, 'The Chronicles of Narnia', 'C.S. Lewis', '1953-09-23', 784, 1, 3.5, 291);
+	Values (9780545010221, 'Harry Potter and the Deathly Hallows', 'J.K. Rowling', '2009-07-31', 607, 2, 4.5, 1254), (9780804189354, 'The Martian', 'Andy Weir', '2011-05-04', 400, 1, 4.3, 567), (9780064400558, 'Charlotte\'s Web', 'E.B. White', '1952-10-15', 184, 0, 3.7, 459), (9780486828060, 'Little Women', 'Louisa May Alcott', '1868-9-30', 480, 3, 3.2, 692), (9780060598242, 'The Chronicles of Narnia', 'C.S. Lewis', '1953-09-23', 784, 2, 3.5, 291);
     
 INSERT INTO USER_PREV_BOOKS
 	Values (840829, 9780545010221), (840829, 9780804189354), (840829, 9780064400558), (549275, 9780545010221), (290378, 9780545010221);
