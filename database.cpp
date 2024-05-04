@@ -256,3 +256,60 @@ void viewBorrowHistory(MYSQL *conn, std::string username)
     // Clean up the result set
     mysql_free_result(res);
 }
+
+void manageAccount(MYSQL *conn, bool admin, std::string username)
+{
+    std::string targetUser;
+    std::string newPassword;
+    char query[1000];
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+
+    // If the user is an admin, they can choose which account to manage
+    if (admin) {
+        std::cout << "Enter employee_id or user_id to manage: ";
+        std::cin >> targetUser;
+    } else {
+        // Non-admin users can only manage their own account
+        targetUser = username;
+    }
+
+    // Determine if the target user is a librarian or a patron
+    sprintf(query, "SELECT 'Librarian' as Role FROM LIBRARIAN WHERE employee_id='%s' UNION SELECT 'Patron' as Role FROM PATRON WHERE user_id='%s'", targetUser.c_str(), targetUser.c_str());
+    if (mysql_query(conn, query)) {
+        std::cout << "Error checking user role: " << mysql_error(conn) << "\n";
+        return;
+    }
+
+    res = mysql_store_result(conn);
+    if (!res || mysql_num_rows(res) == 0) {
+        std::cout << "User not found.\n";
+        if (res) {
+            mysql_free_result(res);
+        }
+        return;
+    }
+
+    row = mysql_fetch_row(res);
+    std::string role = row[0]; // This should contain 'Librarian' or 'Patron'
+    mysql_free_result(res);
+
+    // Prompt for the new password
+    std::cout << "Enter new password for " << (role == "Librarian" ? "librarian" : "patron") << " ID " << targetUser << ": ";
+    std::cin >> newPassword;
+
+    // Set the table and column names based on the role
+    std::string table = role == "Librarian" ? "LIBRARIAN" : "PATRON";
+    std::string idColumn = role == "Librarian" ? "employee_id" : "user_id";
+    std::string passwordColumn = role == "Librarian" ? "e_pass" : "user_pass";
+
+    // Prepare the query to update the password
+    sprintf(query, "UPDATE %s SET %s='%s' WHERE %s='%s'", table.c_str(), passwordColumn.c_str(), newPassword.c_str(), idColumn.c_str(), targetUser.c_str());
+
+    // Execute the query
+    if (mysql_query(conn, query)) {
+        std::cout << "ERROR UPDATING PASSWORD: " << mysql_error(conn) << "\n";
+    } else {
+        std::cout << "Password updated successfully for " << (role == "Librarian" ? "librarian" : "patron") << " ID " << targetUser << "\n";
+    }
+}

@@ -81,6 +81,7 @@ int main()
                 viewBorrowHistory(conn, username);
                 break;
             case 5: // Manage Account
+                manageAccount(conn, isAdmin, username);
                 break;
             case 6: // Check Out Book
                 break;

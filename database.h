@@ -10,6 +10,7 @@ bool searchISBN(MYSQL *conn, std::string ISBN);
 void searchBooks(MYSQL *conn);
 void addReview(MYSQL *conn, std::string ISBN, std::string username);
 void viewBorrowHistory(MYSQL *conn, std::string username);
+void manageAccount(MYSQL *conn, bool admin, std::string username);
 
 
 #endif
