@@ -69,14 +69,14 @@ std::string userID(MYSQL *conn, std::string username)
         std::cin >> username;
         query = "SELECT user_id FROM PATRON WHERE user_name = '" + username + "'";
     }
-    
+
     res = mysql_store_result(conn);
     if((row = mysql_fetch_row(res)) != NULL)
         {
             userid = row[0];
             mysql_free_result(res);
         }
-    
+
     return userid;
 }
 
@@ -389,6 +389,302 @@ void checkIn(MYSQL *conn)
     mysql_query(conn, updateRating.c_str());
 
     std::cout << "Book has been checked in" << std::endl;
+}
+
+void addBooks(MYSQL *conn) {
+    std::string ISBN, title, author, publish_date;
+    int page_count, additional_copies;
+    int prev_rating = 0;  // Assuming new books start with no ratings
+    int num_ratings = 0;  // Initializing num_ratings to 0 for new books
+
+    // Collect book details from user
+    std::cout << "Enter ISBN: ";
+    std::getline(std::cin, ISBN);
+    std::cout << "Enter Title: ";
+    std::getline(std::cin, title);
+    std::cout << "Enter Author: ";
+    std::getline(std::cin, author);
+    std::cout << "Enter Publish Date (YYYY-MM-DD): ";
+    std::getline(std::cin, publish_date);
+    std::cout << "Enter Page Count: ";
+    std::cin >> page_count;
+    std::cin.ignore();
+    std::cout << "Enter number of copies to add: ";
+    std::cin >> additional_copies;
+    std::cin.ignore();
+
+    // Check if the book already exists in the database
+    char check_query[1000];
+    sprintf(check_query, "SELECT availability FROM BOOK WHERE ISBN='%s'", ISBN.c_str());
+    if (mysql_query(conn, check_query)) {
+        std::cout << "ERROR CHECKING BOOK EXISTENCE: " << mysql_error(conn) << "\n";
+        return;
+    }
+
+    MYSQL_RES *res = mysql_store_result(conn);
+    if (mysql_num_rows(res) > 0) {
+        MYSQL_ROW row = mysql_fetch_row(res);
+        int current_availability = atoi(row[0]);
+        mysql_free_result(res);
+
+        // Book exists, update the availability
+        int new_availability = current_availability + additional_copies;
+        char update_query[1000];
+        sprintf(update_query, "UPDATE BOOK SET availability = %d WHERE ISBN='%s'", new_availability, ISBN.c_str());
+        if (mysql_query(conn, update_query)) {
+            std::cout << "ERROR UPDATING BOOK AVAILABILITY: " << mysql_error(conn) << "\n";
+        } else {
+            std::cout << "Book availability updated successfully. Total available now: " << new_availability << "\n";
+        }
+        return;
+    } else {
+        // If the book does not exist, insert the new book into the database
+        char insert_query[1000];
+        sprintf(insert_query, "INSERT INTO BOOK (ISBN, title, author, publish_date, page_count, availability, prev_rating, num_ratings) VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, %d)",
+            ISBN.c_str(), title.c_str(), author.c_str(), publish_date.c_str(), page_count, additional_copies, prev_rating, num_ratings);
+
+        // Execute the query
+        if (mysql_query(conn, insert_query)) {
+            std::cout << "ERROR ADDING BOOK: " << mysql_error(conn) << "\n";
+        } else {
+            std::cout << "New book added successfully with " << additional_copies << " copies available.\n";
+        }
+    }
+    mysql_free_result(res);
+
+}
+
+void editBooks(MYSQL *conn) {
+    std::string ISBN, title, author, publish_date;
+    int page_count = -1;
+    int availability = -1;
+    std::string query = "UPDATE BOOK SET ";
+
+    // Ask for ISBN to identify the book to edit
+    std::cout << "Enter ISBN of the book to edit: ";
+    std::getline(std::cin, ISBN);
+
+    // Check if the book exists
+    char check_query[1000];
+    sprintf(check_query, "SELECT * FROM BOOK WHERE ISBN='%s'", ISBN.c_str());
+    if (mysql_query(conn, check_query)) {
+        std::cout << "ERROR CHECKING BOOK EXISTENCE: " << mysql_error(conn) << "\n";
+        return;
+    }
+
+    MYSQL_RES *res = mysql_store_result(conn);
+    if (mysql_num_rows(res) == 0) {
+        std::cout << "No book found with ISBN " << ISBN << ".\n";
+        mysql_free_result(res);
+        return;
+    }
+    mysql_free_result(res);  // Free result as soon as it is no longer needed
+
+    // Book exists, collect new details from user
+    std::cout << "Enter new Title (or press Enter to skip): ";
+    std::getline(std::cin, title);
+    std::cout << "Enter new Author (or press Enter to skip): ";
+    std::getline(std::cin, author);
+    std::cout << "Enter new Publish Date (YYYY-MM-DD or press Enter to skip): ";
+    std::getline(std::cin, publish_date);
+    std::cout << "Enter new Page Count (or -1 to skip): ";
+    std::cin >> page_count;
+    std::cin.ignore();
+    std::cout << "Enter new Availability (number of copies or -1 to skip): ";
+    std::cin >> availability;
+    std::cin.ignore();
+
+    bool first = true;
+
+    if (!title.empty()) {
+        query += "title = '" + title + "'";
+        first = false;
+    }
+
+    if (!author.empty()) {
+        if (!first)
+            query += ", ";
+        query += "author = '" + author + "'";
+        first = false;
+    }
+
+    if (!publish_date.empty()) {
+        if (!first)
+            query += ", ";
+        query += "publish_date = '" + publish_date + "'";
+        first = false;
+    }
+
+    if (page_count != -1) {
+        if (!first)
+            query += ", ";
+        query += "page_count = " + std::to_string(page_count);
+        first = false;
+    }
+
+    if (availability != -1) {
+        if (!first)
+            query += ", ";
+        query += "availability = " + std::to_string(availability);
+        first = false;
+    }
+
+    query += " WHERE ISBN = '" + ISBN + "'";
+
+    // Execute the update query
+    if (mysql_query(conn, query.c_str())) {
+        std::cout << "ERROR UPDATING BOOK: " << mysql_error(conn) << "\n";
+    } else {
+        std::cout << "Book updated successfully.\n";
+    }
+}
+
+void addBooks(MYSQL *conn) {
+    std::string ISBN, title, author, publish_date;
+    int page_count, additional_copies;
+    int prev_rating = 0;  // Assuming new books start with no ratings
+    int num_ratings = 0;  // Initializing num_ratings to 0 for new books
+
+    // Collect book details from user
+    std::cout << "Enter ISBN: ";
+    std::getline(std::cin, ISBN);
+    std::cout << "Enter Title: ";
+    std::getline(std::cin, title);
+    std::cout << "Enter Author: ";
+    std::getline(std::cin, author);
+    std::cout << "Enter Publish Date (YYYY-MM-DD): ";
+    std::getline(std::cin, publish_date);
+    std::cout << "Enter Page Count: ";
+    std::cin >> page_count;
+    std::cin.ignore();
+    std::cout << "Enter number of copies to add: ";
+    std::cin >> additional_copies;
+    std::cin.ignore();
+
+    // Check if the book already exists in the database
+    char check_query[1000];
+    sprintf(check_query, "SELECT availability FROM BOOK WHERE ISBN='%s'", ISBN.c_str());
+    if (mysql_query(conn, check_query)) {
+        std::cout << "ERROR CHECKING BOOK EXISTENCE: " << mysql_error(conn) << "\n";
+        return;
+    }
+
+    MYSQL_RES *res = mysql_store_result(conn);
+    if (mysql_num_rows(res) > 0) {
+        MYSQL_ROW row = mysql_fetch_row(res);
+        int current_availability = atoi(row[0]);
+        mysql_free_result(res);
+
+        // Book exists, update the availability
+        int new_availability = current_availability + additional_copies;
+        char update_query[1000];
+        sprintf(update_query, "UPDATE BOOK SET availability = %d WHERE ISBN='%s'", new_availability, ISBN.c_str());
+        if (mysql_query(conn, update_query)) {
+            std::cout << "ERROR UPDATING BOOK AVAILABILITY: " << mysql_error(conn) << "\n";
+        } else {
+            std::cout << "Book availability updated successfully. Total available now: " << new_availability << "\n";
+        }
+        return;
+    } else {
+        // If the book does not exist, insert the new book into the database
+        char insert_query[1000];
+        sprintf(insert_query, "INSERT INTO BOOK (ISBN, title, author, publish_date, page_count, availability, prev_rating, num_ratings) VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, %d)",
+            ISBN.c_str(), title.c_str(), author.c_str(), publish_date.c_str(), page_count, additional_copies, prev_rating, num_ratings);
+
+        // Execute the query
+        if (mysql_query(conn, insert_query)) {
+            std::cout << "ERROR ADDING BOOK: " << mysql_error(conn) << "\n";
+        } else {
+            std::cout << "New book added successfully with " << additional_copies << " copies available.\n";
+        }
+    }
+    mysql_free_result(res);
+
+}
+
+void editBooks(MYSQL *conn) {
+    std::string ISBN, title, author, publish_date;
+    int page_count = -1;
+    int availability = -1;
+    std::string query = "UPDATE BOOK SET ";
+
+    // Ask for ISBN to identify the book to edit
+    std::cout << "Enter ISBN of the book to edit: ";
+    std::getline(std::cin, ISBN);
+
+    // Check if the book exists
+    char check_query[1000];
+    sprintf(check_query, "SELECT * FROM BOOK WHERE ISBN='%s'", ISBN.c_str());
+    if (mysql_query(conn, check_query)) {
+        std::cout << "ERROR CHECKING BOOK EXISTENCE: " << mysql_error(conn) << "\n";
+        return;
+    }
+
+    MYSQL_RES *res = mysql_store_result(conn);
+    if (mysql_num_rows(res) == 0) {
+        std::cout << "No book found with ISBN " << ISBN << ".\n";
+        mysql_free_result(res);
+        return;
+    }
+    mysql_free_result(res);  // Free result as soon as it is no longer needed
+
+    // Book exists, collect new details from user
+    std::cout << "Enter new Title (or press Enter to skip): ";
+    std::getline(std::cin, title);
+    std::cout << "Enter new Author (or press Enter to skip): ";
+    std::getline(std::cin, author);
+    std::cout << "Enter new Publish Date (YYYY-MM-DD or press Enter to skip): ";
+    std::getline(std::cin, publish_date);
+    std::cout << "Enter new Page Count (or -1 to skip): ";
+    std::cin >> page_count;
+    std::cin.ignore();
+    std::cout << "Enter new Availability (number of copies or -1 to skip): ";
+    std::cin >> availability;
+    std::cin.ignore();
+
+    bool first = true;
+
+    if (!title.empty()) {
+        query += "title = '" + title + "'";
+        first = false;
+    }
+
+    if (!author.empty()) {
+        if (!first)
+            query += ", ";
+        query += "author = '" + author + "'";
+        first = false;
+    }
+
+    if (!publish_date.empty()) {
+        if (!first)
+            query += ", ";
+        query += "publish_date = '" + publish_date + "'";
+        first = false;
+    }
+
+    if (page_count != -1) {
+        if (!first)
+            query += ", ";
+        query += "page_count = " + std::to_string(page_count);
+        first = false;
+    }
+
+    if (availability != -1) {
+        if (!first)
+            query += ", ";
+        query += "availability = " + std::to_string(availability);
+        first = false;
+    }
+
+    query += " WHERE ISBN = '" + ISBN + "'";
+
+    // Execute the update query
+    if (mysql_query(conn, query.c_str())) {
+        std::cout << "ERROR UPDATING BOOK: " << mysql_error(conn) << "\n";
+    } else {
+        std::cout << "Book updated successfully.\n";
+    }
 }
 
 void addNewUser(MYSQL *conn)

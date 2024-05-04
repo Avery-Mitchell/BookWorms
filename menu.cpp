@@ -115,10 +115,12 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
             }
         case 8: // Add Book
             {
+                addBooks(conn);
             break;
             }
         case 9: // Edit Book
             {
+                editBooks(conn);
             break;
             }
         case 10: // Remove Book
