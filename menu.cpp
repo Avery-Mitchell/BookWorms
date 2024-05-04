@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string.h>
+#include <mysql/mysql.h>
 #include "menu.h"
+#include "database.h"
 using namespace std;
 
 void printLogo()
@@ -38,7 +40,7 @@ void collectLogin(std::string& username, std::string& password, bool& isAdmin)
     }
 }
 
-void printMenu(bool isAdmin)
+void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdmin)
 {
     cout << endl;
     cout << "===============================\n";
@@ -64,5 +66,75 @@ void printMenu(bool isAdmin)
         cout << "10. Remove Book\n";
         cout << "11. Add New Acount\n";
         cout << "12. Remove Account\n\n";
+    }
+
+    int option;
+    std::cin.clear();
+    std::cout << "Enter Option: ";
+    std::cin >> option;
+    std::cin.clear();
+    switch(option){
+        case 1: // Quit
+            {
+            std::cout << "BYE!";
+            exit(1);
+            break;
+            }
+        case 2: // Search Books
+            {
+            searchBooks(conn);
+            break;
+            }
+        case 3: // Add Review 
+            {
+            std::string reviewISBN;
+            std::cout << "Enter ISBN of the book to review: ";
+            std::cin >> reviewISBN;
+            addReview(conn, reviewISBN, username);
+            break;
+            }
+        case 4: // View Borrow History
+            {
+            viewBorrowHistory(conn, userid);
+            break;
+            }
+        case 5: // Manage Account
+            {
+            manageAccount(conn, isAdmin, userid);
+            break;
+            }
+        case 6: // Check Out Book
+            {
+            break;
+            }
+        case 7: // Check In Book
+            {
+            break;
+            }
+        case 8: // Add Book
+            {
+            break;
+            }
+        case 9: // Edit Book
+            {
+            break;
+            }
+        case 10: // Remove Book
+            {
+            break;
+            }
+        case 11: // Add new Account
+            {
+            break;
+            }
+        case 12: // Remove Account
+            {
+            break;
+            }
+        default:
+            {
+            std::cout << "Select Valid Option";
+            break;
+            }
     }
 }

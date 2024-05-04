@@ -2,15 +2,15 @@
 #include <cstring>
 #include "database.h"
 
-bool login(MYSQL *conn, bool& admin, std::string username, std::string password)
+bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, std::string password)
 {
     MYSQL_RES *res;
     MYSQL_ROW row;
     char query1[1000];
     char query2[1000];
 
-    sprintf(query1, "SELECT * FROM LIBRARIAN WHERE e_name='%s' AND e_pass='%s'", username.c_str(), password.c_str());
-    sprintf(query2, "SELECT * FROM PATRON WHERE user_name='%s' AND user_pass='%s'", username.c_str(), password.c_str());
+    sprintf(query1, "SELECT e_id FROM LIBRARIAN WHERE e_name='%s' AND e_pass='%s'", username.c_str(), password.c_str());
+    sprintf(query2, "SELECT user_id FROM PATRON WHERE user_name='%s' AND user_pass='%s'", username.c_str(), password.c_str());
 
     if(admin)
     {
@@ -22,6 +22,7 @@ bool login(MYSQL *conn, bool& admin, std::string username, std::string password)
         res = mysql_store_result(conn);
         if((row = mysql_fetch_row(res)) != NULL)
         {
+            userid = row[0];
             mysql_free_result(res);
             return true;
         }
@@ -41,6 +42,7 @@ bool login(MYSQL *conn, bool& admin, std::string username, std::string password)
         res = mysql_store_result(conn);
         if((row = mysql_fetch_row(res)) != NULL)
         {
+            userid = row[0];
             mysql_free_result(res);
             return true;
         }

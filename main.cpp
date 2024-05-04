@@ -41,68 +41,27 @@ int main()
     printLogo();
 
     bool isAdmin = false;
-    std::string username, password;
+    std::string username, password, userid;
     int option;
     collectLogin(username, password, isAdmin);
-    while(!login(conn, isAdmin, username, password))
+    while(!login(conn, isAdmin, userid, username, password))
     {
         std::cout << "INCORRECT, TRY AGAIN\n";
         collectLogin(username, password, isAdmin);
-        login(conn, isAdmin, username, password);
+        login(conn, isAdmin, userid, username, password);
     }
-    if(login(conn, isAdmin, username, password))
+    if(login(conn, isAdmin, userid, username, password))
     {
         std::cout << "LOGIN SUCCESSFUL\n";
     }
 
     // TODO: THIS NEEDS TO BE FIXED
+    
     while(true)
     {
-        printMenu(isAdmin);
-        std::cout << "Enter Option: ";
-        std::cin >> option;
+        printMenu(conn, username, userid, isAdmin);
         std::cin.ignore();
-        switch(option){
-            case 1: // Quit
-                std::cout << "BYE!";
-                exit(1);
-                break;
-            case 2: // Search Books
-                searchBooks(conn);
-                break;
-            case 3: {// Add Review 
-                std::string reviewISBN;
-                std::cout << "Enter ISBN of the book to review: ";
-                std::cin >> reviewISBN;
-                addReview(conn, reviewISBN, username);
-                break;
-            }
-            case 4: // View Borrow History
-                viewBorrowHistory(conn, username);
-                break;
-            case 5: // Manage Account
-                manageAccount(conn, isAdmin, username);
-                break;
-            case 6: // Check Out Book
-                break;
-            case 7: // Check In Book
-                break;
-            case 8: // Add Book
-                break;
-            case 9: // Edit Book
-                break;
-            case 10: // Remove Book
-                break;
-            case 11: // Add new Account
-                break;
-            case 12: // Remove Account
-                break;
-            default:
-                std::cout << "Select Valid Option";
-                break;
-        }
-        option = 1;
-        std::cin.sync();
     }
+
     return 0;
 }

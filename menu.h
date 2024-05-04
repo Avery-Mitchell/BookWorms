@@ -3,6 +3,6 @@
 
 void printLogo();
 void collectLogin(std::string& username, std::string& password, bool& isAdmin);
-void printMenu(bool isAdmin);
+void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdmin);
 
 #endif
