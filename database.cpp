@@ -275,7 +275,7 @@ void manageAccount(MYSQL *conn, bool admin, std::string username)
     }
 
     // Determine if the target user is a librarian or a patron
-    sprintf(query, "SELECT 'Librarian' as Role FROM LIBRARIAN WHERE employee_id='%s' UNION SELECT 'Patron' as Role FROM PATRON WHERE user_id='%s'", targetUser.c_str(), targetUser.c_str());
+    sprintf(query, "SELECT 'Librarian' as Role FROM LIBRARIAN WHERE e_id='%s' UNION SELECT 'Patron' as Role FROM PATRON WHERE user_id='%s'", targetUser.c_str(), targetUser.c_str());
     if (mysql_query(conn, query)) {
         std::cout << "Error checking user role: " << mysql_error(conn) << "\n";
         return;
