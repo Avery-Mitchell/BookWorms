@@ -342,7 +342,7 @@ void viewBorrowHistory(MYSQL *conn, std::string userid)
     mysql_free_result(res);
 }
 
-void manageAccount(MYSQL *conn, bool admin, std::string username)
+void manageAccount(MYSQL *conn, bool admin, std::string userid)
 {
     std::string targetUser;
     std::string newPassword;
@@ -356,7 +356,7 @@ void manageAccount(MYSQL *conn, bool admin, std::string username)
         std::cin >> targetUser;
     } else {
         // Non-admin users can only manage their own account
-        targetUser = username;
+        targetUser = userid;
     }
 
     // Determine if the target user is a librarian or a patron
@@ -385,11 +385,11 @@ void manageAccount(MYSQL *conn, bool admin, std::string username)
 
     // Set the table and column names based on the role
     std::string table = role == "Librarian" ? "LIBRARIAN" : "PATRON";
-    std::string idColumn = role == "Librarian" ? "employee_id" : "user_id";
+    std::string idColumn = role == "Librarian" ? "e_id" : "user_id";
     std::string passwordColumn = role == "Librarian" ? "e_pass" : "user_pass";
 
     // Prepare the query to update the password
-    sprintf(query, "UPDATE %s SET %s='%s' WHERE %s='%s'", table.c_str(), passwordColumn.c_str(), newPassword.c_str(), idColumn.c_str(), targetUser.c_str());
+    sprintf(query, "UPDATE %s SET %s='%s' WHERE %s= '%s'", table.c_str(), passwordColumn.c_str(), newPassword.c_str(), idColumn.c_str(), targetUser.c_str());
 
     // Execute the query
     if (mysql_query(conn, query)) {

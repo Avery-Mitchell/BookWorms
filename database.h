@@ -21,7 +21,7 @@ void addReview(MYSQL *conn, std::string ISBN, std::string username);
 //Allows users to see their borrow history
 void viewBorrowHistory(MYSQL *conn, std::string userid);
 //Allows users to change their password
-void manageAccount(MYSQL *conn, bool admin, std::string username);
+void manageAccount(MYSQL *conn, bool admin, std::string userid);
 //Allows librarians to check out books
 void checkOut(MYSQL *conn);
 //Allows librarians to check in books
