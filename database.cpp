@@ -10,9 +10,12 @@ bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, 
     char query1[1000];
     char query2[1000];
 
+    //Creates the query for validating a librarian's credentials
     sprintf(query1, "SELECT e_id FROM LIBRARIAN WHERE e_name='%s' AND e_pass='%s'", username.c_str(), password.c_str());
+    //Creates the query for validating a patron's credentials
     sprintf(query2, "SELECT user_id FROM PATRON WHERE user_name='%s' AND user_pass='%s'", username.c_str(), password.c_str());
 
+    //Sends the librarians query and stores the results
     if(mysql_query(conn, query1))
     {
         
@@ -29,6 +32,8 @@ bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, 
         }
         mysql_free_result(res);
     }
+
+    //Sends the patron query and stores the results
     if(mysql_query(conn, query2))
     {
         std::cout << "Error querying database" << std::endl;
@@ -96,7 +101,7 @@ int getMaxID(MYSQL *conn, std::string tableName, std::string idColumnName) {
     return maxID;
 }
 
-// SEARCHES FOR A BOOK BY ITS NAME
+//Gets called by searchBooks()
 bool searchName(MYSQL *conn, std::string title)
 {
     MYSQL_RES *res;
@@ -107,7 +112,7 @@ bool searchName(MYSQL *conn, std::string title)
 
     if(mysql_query(conn, query))
     {
-        std::cout << "ERROR QUERYING DATABASE\n";
+        std::cout << "ERROR QUERYING DATABASE" << std::endl;
         return false;
     }
 
@@ -142,6 +147,7 @@ bool searchName(MYSQL *conn, std::string title)
     return false;
 }
 
+//Gets called by searchBooks()
 bool searchISBN(MYSQL *conn, std::string ISBN)
 {
     MYSQL_RES *res;
@@ -194,6 +200,7 @@ void searchBooks(MYSQL *conn)
     std::string ISBN;
     std::cout << "Search by Title or ISBN [T/I]: ";
     std::cin >> temp;
+    std::cin.ignore();
     while(temp != 'T' && temp != 'I')
     {
         std::cout << "Search by Title or ISBN [T/I]: ";
@@ -202,7 +209,7 @@ void searchBooks(MYSQL *conn)
     if(temp == 'T')
     {
         std::cout << "Enter Title: ";
-        std::cin >> title;
+        std::getline(std::cin, title);
         searchName(conn, title);
     }
     else
@@ -250,12 +257,35 @@ void addReview(MYSQL *conn, std::string ISBN, std::string username)
     res = mysql_store_result(conn);
     if((row = mysql_fetch_row(res))) {
         rate = atoi(row[0]);  // Use existing rate if available
+        char temp;
+        std::cout << "Change rating [Y/N]: ";
+        std::cin >> temp;
+        while(temp != 'Y' && temp != 'N')
+        {
+            std::cout << "Change rating [Y/N]: ";
+            std::cin >> temp;
+        }
+        if(temp == 'Y')
+        {
+            std::cout << "Enter new rating (0-5): ";
+            std::cin >> rate;
+            while(rate < 0 || rate > 5)
+            {
+                std::cout << "Enter new rating (0-5): ";
+                std::cin >> rate; 
+            }
+        }
         mysql_free_result(res);
     } else {
         // If no existing rate found, prompt user to enter a new rating
         mysql_free_result(res);
         std::cout << "No previous rating found by user. Enter your rating (0-5): ";
         std::cin >> rate;
+        while(rate < 0 || rate > 5)
+        {
+            std::cout << "Enter new rating (0-5): ";
+            std::cin >> rate; 
+        }
     }
 
     // Update the book's rating and number of ratings
