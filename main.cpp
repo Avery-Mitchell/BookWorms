@@ -55,13 +55,15 @@ int main()
         std::cout << "LOGIN SUCCESSFUL\n";
     }
 
-    checkOut(conn);
-
-    //while(true)
-    //{
-    //    printMenu(conn, username, userid, isAdmin);
-    //    std::cin.ignore();
-    //}
+    while(true)
+    {
+        std::string temp;
+        printMenu(conn, username, userid, isAdmin);
+        //std::cin.ignore();
+        std::cout << "\n\nPress Any Key to Continue ";
+        std::getline(std::cin, temp);
+        std::cout << std::endl;
+    }
 
     return 0;
 }
