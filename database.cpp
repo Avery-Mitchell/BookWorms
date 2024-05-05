@@ -13,46 +13,39 @@ bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, 
     sprintf(query1, "SELECT e_id FROM LIBRARIAN WHERE e_name='%s' AND e_pass='%s'", username.c_str(), password.c_str());
     sprintf(query2, "SELECT user_id FROM PATRON WHERE user_name='%s' AND user_pass='%s'", username.c_str(), password.c_str());
 
-    if(admin)
+    if(mysql_query(conn, query1))
     {
-        if(mysql_query(conn, query1))
-        {
-            std::cout << "ERROR QUERYING DATABASE\n";
-            return false;
-        }
-        res = mysql_store_result(conn);
-        if((row = mysql_fetch_row(res)) != NULL)
-        {
-            userid = row[0];
-            mysql_free_result(res);
-            return true;
-        }
-        else
-        {
-            mysql_free_result(res);
-            return false;
-        }
+        
     }
     else
     {
-        if(mysql_query(conn, query2))
-        {
-            std::cout << "ERROR QUERYING DATABASE\n";
-            return false;
-        }
         res = mysql_store_result(conn);
         if((row = mysql_fetch_row(res)) != NULL)
         {
             userid = row[0];
             mysql_free_result(res);
+            admin = true;
             return true;
         }
-        else
-        {
-            mysql_free_result(res);
-            return false;
-        }
+        mysql_free_result(res);
     }
+    if(mysql_query(conn, query2))
+    {
+        std::cout << "Error querying database" << std::endl;
+        return false;
+    }
+    res = mysql_store_result(conn);
+    if((row = mysql_fetch_row(res)) != NULL)
+    {
+        userid = row[0];
+        mysql_free_result(res);
+        admin = false;
+        return true;
+    }
+    mysql_free_result(res);
+
+    std::cout << "No users named " << username << " found" << std::endl;
+    return false;
 }
 
 // gets userid from their username

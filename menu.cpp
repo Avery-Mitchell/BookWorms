@@ -19,25 +19,12 @@ void printLogo()
 
 }
 
-void collectLogin(std::string& username, std::string& password, bool& isAdmin)
+void collectLogin(std::string& username, std::string& password)
 {
-    std::string tAdmin = "Z";
-    isAdmin = false;
     std::cout << "ENTER FIRST AND LAST NAME (e.x. John Doe): ";
     std::getline(std::cin, username);
     std::cout << "ENTER PASSWORD (case sensitive): ";
     std::getline(std::cin, password);
-    std::cout << "ARE YOU A LIBRARIAN? [Y/N]: ";
-    std::getline(std::cin, tAdmin);
-    while(tAdmin != "Y" && tAdmin != "N")
-    {
-        std::cout << "ARE YOU A LIBRARIAN? [Y/N]: ";
-        std::cin >> tAdmin;
-    }
-    if(tAdmin == "Y")
-    {
-        isAdmin = true;
-    }
 }
 
 void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdmin)

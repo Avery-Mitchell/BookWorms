@@ -43,11 +43,11 @@ int main()
     bool isAdmin = false;
     std::string username, password, userid;
     int option;
-    collectLogin(username, password, isAdmin);
+    collectLogin(username, password);
     while(!login(conn, isAdmin, userid, username, password))
     {
         std::cout << "INCORRECT, TRY AGAIN\n";
-        collectLogin(username, password, isAdmin);
+        collectLogin(username, password);
         login(conn, isAdmin, userid, username, password);
     }
     if(login(conn, isAdmin, userid, username, password))
