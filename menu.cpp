@@ -105,7 +105,7 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
             }
         case 6: // Check Out Book
             {
-
+                checkOut(conn);
                 break;
             }
         case 7: // Check In Book

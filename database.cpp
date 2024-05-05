@@ -56,27 +56,35 @@ bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, 
 }
 
 // gets userid from their username
-std::string userID(MYSQL *conn, std::string username)
+std::string userID(MYSQL *conn, const std::string& username)
 {
     std::string userid, query;
     MYSQL_RES *res;
     MYSQL_ROW row;
     query = "SELECT user_id FROM PATRON WHERE user_name = '" + username + "'";
-    while(mysql_query(conn, query.c_str()))
+    if(mysql_query(conn, query.c_str()))
     {
-        std::cout << "No patron with that name";
-        std::cout << "What is the patron's name (e.x. John Doe): ";
-        std::cin >> username;
-        query = "SELECT user_id FROM PATRON WHERE user_name = '" + username + "'";
+        std::cout << "Error querying database" << std::endl;
+        return userid;
     }
 
     res = mysql_store_result(conn);
-    if((row = mysql_fetch_row(res)) != NULL)
+    if(res)
+    {
+        row = mysql_fetch_row(res);
+        if(row)
         {
             userid = row[0];
-            mysql_free_result(res);
         }
-
+        else
+        {
+            std::cout << "No user found with username " << username << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Error fetching results" << std::endl;
+    }
     return userid;
 }
 
@@ -357,7 +365,58 @@ void manageAccount(MYSQL *conn, bool admin, std::string username)
     }
 }
 
-void checkout();
+void checkOut(MYSQL *conn)
+{
+    std::string ISBN, userid, username;
+
+    std::cout << "Enter the ISBN of the book: ";
+    std::cin >> ISBN;
+    std::cin.ignore();
+    std::cout << "Enter the Patron's Name (e.x. John Doe): ";
+    std::getline(std::cin, username);
+    userid = userID(conn, username);
+
+    // Checks if the book is available for checkout
+    std::string availabilityQuery = "SELECT availability FROM BOOK WHERE ISBN = " + ISBN;
+    if(mysql_query(conn, availabilityQuery.c_str()))
+    {
+        std::cout << "Error checking out book " << mysql_error(conn) << std::endl;
+        return;
+    }
+    MYSQL_RES *res = mysql_store_result(conn);
+    MYSQL_ROW row = mysql_fetch_row(res);
+    if(!row)
+    {
+        std::cout << "Book not found";
+        return;
+    }
+    int availability = std::stoi(row[0]);
+    mysql_free_result(res);
+    if(availability <= 0)
+    {
+        std::cout << "Book is not available for checkout";
+        return;
+    }
+
+    // Changes CHECK_OUT table
+    std::string checkoutQuery = "INSERT INTO CHECK_OUT (check_out_id, check_out_ISBN, checkout_date) VALUES (" + userid + ", " + ISBN + ", CURDATE())";
+    std::cout << checkoutQuery << std::endl;
+    if(mysql_query(conn, checkoutQuery.c_str()))
+    {
+        std::cout << "Error checking out book: " << mysql_error(conn) << std::endl;
+        return;
+    }
+
+    // Decrements availability
+    std::string updateAvailability = "UPDATE BOOK SET availability = availability - 1 WHERE ISBN = " + ISBN;
+    if(mysql_query(conn, updateAvailability.c_str()))
+    {
+        std::cout << "Error updating book's availability " << mysql_error(conn) << std::endl;
+        return;
+    }
+
+    std::cout << "Book checked out successfully" << std::endl;
+}
 
 void checkIn(MYSQL *conn)
 {

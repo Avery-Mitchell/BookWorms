@@ -55,11 +55,13 @@ int main()
         std::cout << "LOGIN SUCCESSFUL\n";
     }
 
-    while(true)
-    {
-        printMenu(conn, username, userid, isAdmin);
-        std::cin.ignore();
-    }
+    checkOut(conn);
+
+    //while(true)
+    //{
+    //    printMenu(conn, username, userid, isAdmin);
+    //    std::cin.ignore();
+    //}
 
     return 0;
 }
