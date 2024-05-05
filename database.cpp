@@ -299,14 +299,14 @@ void addReview(MYSQL *conn, std::string ISBN, std::string username)
     }
 }
 
-void viewBorrowHistory(MYSQL *conn, std::string username)
+void viewBorrowHistory(MYSQL *conn, std::string userid)
 {
     MYSQL_RES *res;
     MYSQL_ROW row;
     char query[1000];
 
     // Construct the SQL query to find the previous books borrowed by the user
-    sprintf(query, "SELECT prev_book_ISBN, title FROM USER_PREV_BOOKS JOIN BOOK ON USER_PREV_BOOKS.prev_book_ISBN = BOOK.ISBN WHERE users_id='%s'", username.c_str());
+    sprintf(query, "SELECT prev_book_ISBN, title FROM USER_PREV_BOOKS JOIN BOOK ON USER_PREV_BOOKS.prev_book_ISBN = BOOK.ISBN WHERE users_id='%s'", userid.c_str());
 
     // Execute the query
     if(mysql_query(conn, query))
@@ -326,13 +326,13 @@ void viewBorrowHistory(MYSQL *conn, std::string username)
     // Check if any rows are returned
     if(mysql_num_rows(res) == 0)
     {
-        std::cout << "No borrowing history found for user ID: " << username << "\n";
+        std::cout << "No borrowing history found for user ID: " << userid << "\n";
         mysql_free_result(res);
         return;
     }
 
     // Output the titles and ISBNs of the previously borrowed books
-    std::cout << "Borrowing History for User ID " << username << ":\n";
+    std::cout << "Borrowing History for User ID " << userid << ":\n";
     while ((row = mysql_fetch_row(res)) != NULL)
     {
         std::cout << "ISBN: " << row[0] << " - Title: " << row[1] << "\n";

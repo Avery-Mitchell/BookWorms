@@ -6,7 +6,7 @@
 //Checks to see if the username information is valid
 bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, std::string password);
 //Returns a user's userid based on their name
-//Only works with patrons, not librarians
+//Only works with patrons, not
 std::string userID(MYSQL *conn, const std::string& username);
 //Returns the maximum ID value, used to ensure no duplicate primary keys
 int getMaxID(MYSQL *conn, std::string tableName, std::string idColumnName);
@@ -19,7 +19,7 @@ void searchBooks(MYSQL *conn);
 //Allows users to add reviews to books
 void addReview(MYSQL *conn, std::string ISBN, std::string username);
 //Allows users to see their borrow history
-void viewBorrowHistory(MYSQL *conn, std::string username);
+void viewBorrowHistory(MYSQL *conn, std::string userid);
 //Allows users to change their password
 void manageAccount(MYSQL *conn, bool admin, std::string username);
 //Allows librarians to check out books
