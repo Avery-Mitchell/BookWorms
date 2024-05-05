@@ -6,6 +6,7 @@
 //Checks to see if the username information is valid
 bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, std::string password);
 //Returns a user's userid based on their name
+//Only works with patrons, not librarians
 std::string userID(MYSQL *conn, const std::string& username);
 //Returns the maximum ID value, used to ensure no duplicate primary keys
 int getMaxID(MYSQL *conn, std::string tableName, std::string idColumnName);

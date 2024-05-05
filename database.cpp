@@ -48,7 +48,8 @@ bool login(MYSQL *conn, bool& admin, std::string& userid, std::string username, 
     return false;
 }
 
-// gets userid from their username
+// gets userid from their username, only works for searching the PATRON table
+// 
 std::string userID(MYSQL *conn, const std::string& username)
 {
     std::string userid, query;
@@ -118,19 +119,24 @@ bool searchName(MYSQL *conn, std::string title)
            std::cout << "Title: " << row[1];
            std::cout << "\nAuthor: " << row[2];
            std::cout << "\nPublished Date: " << row[3];
-           std::cout << "\nPage Count: " << row[4] << "pages";
+           std::cout << "\nPage Count: " << row[4] << " pages";
            std::cout << "\nISBN: " << row[0];
            std::cout << "\nAvailability: " << row[5];
-           std::cout << "\nRating: " << row[6];
+           std::cout << "\nRating: " << row[6] << std::endl;
 
            mysql_free_result(res);
            return true;
         }
-        mysql_free_result(res);
+        else
+        {
+            std::cout << title << " not found" << std::endl;
+            mysql_free_result(res);
+            return false;
+        }
     }
     else
     {
-        std::cout << "BOOK NOT FOUND :(\n";
+        std::cout << "Error fetching result" << std::endl;
         return false;
     }
     return false;
@@ -158,19 +164,24 @@ bool searchISBN(MYSQL *conn, std::string ISBN)
            std::cout << "Title: " << row[1];
            std::cout << "\nAuthor: " << row[2];
            std::cout << "\nPublished Date: " << row[3];
-           std::cout << "\nPage Count: " << row[4] << "pages";
+           std::cout << "\nPage Count: " << row[4] << " pages";
            std::cout << "\nISBN: " << row[0];
            std::cout << "\nAvailability: " << row[5];
-           std::cout << "\nRating: " << row[6];
+           std::cout << "\nRating: " << row[6] << std::endl;
 
            mysql_free_result(res);
            return true;
         }
-        mysql_free_result(res);
+        else
+        {
+            std::cout << ISBN << " not found" << std::endl;
+            mysql_free_result(res);
+            return false;
+        }
     }
     else
     {
-        std::cout << "BOOK NOT FOUND :(\n";
+        std::cout << "Error fetching result" << std::endl;
         return false;
     }
     return false;
