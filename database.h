@@ -15,9 +15,10 @@ void viewBorrowHistory(MYSQL *conn, std::string username);
 void manageAccount(MYSQL *conn, bool admin, std::string username);
 void checkOut(MYSQL *conn);
 void checkIn(MYSQL *conn);
-void addNewUser(MYSQL *conn);
 void addBooks(MYSQL *conn);
 void editBooks(MYSQL *conn);
 void removeBooks(MYSQL *conn);
+void addNewUser(MYSQL *conn);
+void removeAccounts(MYSQL *conn);
 
 #endif

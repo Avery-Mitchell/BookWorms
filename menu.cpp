@@ -135,6 +135,7 @@ void printMenu(MYSQL *conn, std::string username, std::string userid, bool isAdm
             }
         case 12: // Remove Account
             {
+                removeAccounts(conn);
                 break;
             }
         default:

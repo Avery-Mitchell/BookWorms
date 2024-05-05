@@ -694,3 +694,59 @@ void addNewUser(MYSQL *conn)
 
     std::cout << "New account successfully created" << std::endl;
 }
+
+void removeAccounts(MYSQL *conn) {
+    char accountType;
+    std::string id, password;
+    std::string table, idColumn, passColumn;
+
+    // Ask user if they are deleting a librarian or patron
+    std::cout << "Delete a Librarian (L) or Patron (P)? ";
+    std::cin >> accountType;
+    std::cin.ignore();
+
+    if (accountType == 'L' || accountType == 'l') {
+        table = "LIBRARIAN";
+        idColumn = "e_id";
+        passColumn = "e_pass";
+    } else if (accountType == 'P' || accountType == 'p') {
+        table = "PATRON";
+        idColumn = "user_id";
+        passColumn = "user_pass";
+    } else {
+        std::cout << "Invalid account type selected.\n";
+        return;
+    }
+
+    // Ask for user ID and password
+    std::cout << "Enter " << (accountType == 'L' ? "employee" : "user") << " ID: ";
+    std::getline(std::cin, id);
+    std::cout << "Enter account password: ";
+    std::getline(std::cin, password);
+
+    // Verify account by checking ID and password
+    char query[1000];
+    sprintf(query, "SELECT %s FROM %s WHERE %s='%s' AND %s='%s'", idColumn.c_str(), table.c_str(), idColumn.c_str(), id.c_str(), passColumn.c_str(), password.c_str());
+    if (mysql_query(conn, query)) {
+        std::cout << "Error querying account: " << mysql_error(conn) << "\n";
+        return;
+    }
+
+    MYSQL_RES *res = mysql_store_result(conn);
+    if (!res || mysql_num_rows(res) == 0) {
+        std::cout << "No account found or password is incorrect.\n";
+        if (res) {
+            mysql_free_result(res);
+        }
+        return;
+    }
+    mysql_free_result(res);
+
+    // If account verified, delete the account
+    sprintf(query, "DELETE FROM %s WHERE %s='%s'", table.c_str(), idColumn.c_str(), id.c_str());
+    if (mysql_query(conn, query)) {
+        std::cout << "Error deleting account: " << mysql_error(conn) << "\n";
+    } else {
+        std::cout << "Account successfully deleted.\n";
+    }
+}
