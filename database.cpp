@@ -434,7 +434,6 @@ void checkOut(MYSQL *conn)
 
     // Changes CHECK_OUT table
     std::string checkoutQuery = "INSERT INTO CHECK_OUT (check_out_id, check_out_ISBN, checkout_date) VALUES (" + userid + ", " + ISBN + ", CURDATE())";
-    std::cout << checkoutQuery << std::endl;
     if(mysql_query(conn, checkoutQuery.c_str()))
     {
         std::cout << "Error checking out book: " << mysql_error(conn) << std::endl;
