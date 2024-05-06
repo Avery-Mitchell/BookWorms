@@ -455,7 +455,8 @@ void checkIn(MYSQL *conn)
 {
     std::string username, userid;
     std::cout << "What is the patron's name (e.x. John Doe): ";
-    std::cin >> username;
+    std::cin.ignore();
+    std::getline(std::cin, username);
     userid = userID(conn, username);
 
     std::string ISBN;
@@ -490,6 +491,7 @@ void addBooks(MYSQL *conn) {
     int num_ratings = 0;  // Initializing num_ratings to 0 for new books
 
     // Collect book details from user
+    std::cin.ignore();
     std::cout << "Enter ISBN: ";
     std::getline(std::cin, ISBN);
     std::cout << "Enter Title: ";
@@ -553,6 +555,7 @@ void editBooks(MYSQL *conn) {
     std::string query = "UPDATE BOOK SET ";
 
     // Ask for ISBN to identify the book to edit
+    std::cin.ignore();
     std::cout << "Enter ISBN of the book to edit: ";
     std::getline(std::cin, ISBN);
 
@@ -636,6 +639,7 @@ void removeBooks(MYSQL *conn) {
     int remove_count, current_availability;
 
     // Ask for ISBN to identify the book to remove copies from
+    std::cin.ignore();
     std::cout << "Enter ISBN of the book to remove copies from: ";
     std::getline(std::cin, ISBN);
 
